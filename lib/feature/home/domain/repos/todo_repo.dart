@@ -6,5 +6,5 @@ abstract class TodoRepo {
   Future<void> editTodo(int id,String title);
   Future<void> deleteTodo(int id);
   Future<void> toggleTodo(Todo todo);
-  Future<int> completedCount();
+  Stream<int> completedCount();
 }

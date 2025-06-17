@@ -9,21 +9,10 @@ class TodoCubit extends Cubit<TodoStates>{
     required this.driftTodoHelper
   }):super(TodoInitial());
 
-  Future<int>count()async{
-    try{
-      final int count = await driftTodoHelper.completedCount();
-      return count;
-    }
-    catch(e){
-      emit(TodoError(e.toString()));
-      rethrow;
-    }
-  }
 
   void fetchTodos()async{
     try{
       final Stream<List<Todo>> todos = driftTodoHelper.fetchTodo();
-      count();
       emit(TodoLoaded(todos));
     }
     catch(e){
@@ -36,7 +25,6 @@ class TodoCubit extends Cubit<TodoStates>{
     try{
       await driftTodoHelper.addTodo(title);
       fetchTodos();
-      count();
     }
     catch(e){
       emit(TodoError(e.toString()));
@@ -47,7 +35,6 @@ class TodoCubit extends Cubit<TodoStates>{
     try{
       await driftTodoHelper.editTodo(id, title);
       fetchTodos();
-      count();
     }
     catch(e){
       emit(TodoError(e.toString()));
@@ -59,7 +46,6 @@ class TodoCubit extends Cubit<TodoStates>{
     try{
       await driftTodoHelper.deleteTodo(id);
       fetchTodos();
-      count();
     }
     catch(e){
       emit(TodoError(e.toString()));
@@ -70,7 +56,6 @@ class TodoCubit extends Cubit<TodoStates>{
     try{
       await driftTodoHelper.toggleTodo(todo);
       fetchTodos();
-      count();
     }
     catch(e){
       emit(TodoError(e.toString()));

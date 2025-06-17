@@ -1,7 +1,7 @@
 import 'dart:async';
-
 import 'package:awesome_quotes/awesome_quotes.dart';
 import 'package:dribbble_todo/feature/home/domain/model/todo.dart';
+import 'package:dribbble_todo/feature/home/presentation/common/completed_counter.dart';
 import 'package:dribbble_todo/feature/home/presentation/cubit/todo_cubit.dart';
 import 'package:dribbble_todo/feature/home/presentation/cubit/todo_states.dart';
 import 'package:dribbble_todo/feature/home/presentation/common/add_todo_button.dart';
@@ -23,7 +23,6 @@ class _HomePageState extends State<HomePage> {
   int completedCount=0;
 
   Future<int> _countTodos()async{
-    completedCount = await context.read<TodoCubit>().count();
     return completedCount;
   }
 
@@ -72,6 +71,68 @@ class _HomePageState extends State<HomePage> {
         messenger.hideCurrentMaterialBanner();
       });
     }
+  }
+
+
+  void _deleteTodo(Todo todo){
+    showDialog(
+      context: context, 
+      builder: (context){
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(
+                Icons.delete_forever_outlined,
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
+              SizedBox(width: 10,),
+              Text("Delete Todo",style:TextStyle(
+                fontWeight: FontWeight.bold
+              ),)
+            ],
+          ),
+          content:Text(
+            "Are you sure you want to delete this Todo?",
+            style: TextStyle(
+              fontSize: 18
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: [
+            TextButton(
+              style:ButtonStyle(
+                backgroundColor:WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+                padding: WidgetStateProperty.all(EdgeInsets.all(5))
+              ),
+              onPressed:()=>context.read<TodoCubit>().deleteTodo(todo.id), 
+              child:Text(
+                "Yes",
+                style: TextStyle(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold
+                ),
+              )
+            ),
+            TextButton(
+              style:ButtonStyle(
+                backgroundColor:WidgetStateProperty.all(Theme.of(context).colorScheme.inversePrimary),
+                padding: WidgetStateProperty.all(EdgeInsets.all(5))
+              ),
+              onPressed:()=>Navigator.of(context).pop(), 
+              child:Text(
+                "No",
+                style: TextStyle(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold
+                ),
+              )
+            ),
+          ],
+        );
+      }
+    );
   }
 
   @override
@@ -165,9 +226,7 @@ class _HomePageState extends State<HomePage> {
                               final todo = todos[index];
                               return TodoTile(
                                 todo: todo,
-                                deleteFunction: () => context
-                                    .read<TodoCubit>()
-                                    .deleteTodo(todo.id),
+                                deleteFunction:()=>_deleteTodo(todo),
                                 onCheck: () =>
                                     context.read<TodoCubit>().toggleTodo(todo),
                               );
@@ -199,20 +258,12 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(height: 40),
-            Text(
-              "Your remaining todos: $completedCount",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.inversePrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
+            CompletedCounter(),
             SizedBox(height: 20,),
             Container(
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Text(
-                '"${quote!.text}~${quote!.author}"',
+                '"${quote!.text}"~${quote!.author}',
                 style: TextStyle(
                   backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                   color: Theme.of(context).colorScheme.primary,

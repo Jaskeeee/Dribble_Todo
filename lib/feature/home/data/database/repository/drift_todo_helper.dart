@@ -70,19 +70,13 @@ class DriftTodoHelper extends TodoRepo{
       throw Exception("Failed to Toggle Completition: $e");
     }
   }
-  
 
   @override
-  Future<int> completedCount()async{
-    try{
-      final query = db.selectOnly(db.todoItem)
-      ..addColumns([db.todoItem.id.count()])
-      ..where(db.todoItem.isCompleted.equals(true));
-      final result = await query.getSingle();
-      return result.read(db.todoItem.id.count())!;
-    }
-    catch(e){
-      throw Exception("Failed to count completed Tasks:$e");
-    }
+  Stream<int> completedCount() {
+    final completedCount = db.todoItem.id.count();
+    final stmt = db.selectOnly(db.todoItem)
+    ..addColumns([completedCount])
+    ..where(db.todoItem.isCompleted.equals(false));
+    return stmt.watchSingle().map((row)=>row.read(completedCount)!);
   }
 }
