@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:awesome_quotes/awesome_quotes.dart';
 import 'package:dribbble_todo/core/cubit/theme_cubit.dart';
+import 'package:dribbble_todo/core/dialogs/curd_dialogs.dart';
 import 'package:dribbble_todo/feature/home/domain/model/todo.dart';
 import 'package:dribbble_todo/feature/home/presentation/common/completed_counter.dart';
 import 'package:dribbble_todo/feature/home/presentation/cubit/todo_cubit.dart';
@@ -11,15 +12,16 @@ import 'package:dribbble_todo/feature/home/presentation/common/todo_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class MobileHomePage extends StatefulWidget {
+  const MobileHomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MobileHomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<MobileHomePage> {
   final TextEditingController controller = TextEditingController();
+  final CurdDialogs dialogs = CurdDialogs();
   final TextEditingController editingController = TextEditingController();
   Quote? quote;
   int completedCount=0;
@@ -44,170 +46,6 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
   
-  void _editFunction(Todo todo){
-    showDialog(
-      context: context, 
-      builder: (context){
-        return AlertDialog(
-          title: Row(
-            children: [
-              Icon(
-                Icons.edit_outlined,
-                color: Theme.of(context).colorScheme.inversePrimary,
-              ),
-              SizedBox(width: 10),
-              Text(
-                "Edit Todo",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                  fontWeight: FontWeight.bold
-                ),
-              )
-            ],
-          ),
-          content: TodoTextField(
-            controller: editingController,
-            hintText: todo.title,
-          ),
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
-          actions: [TextButton(
-              style:ButtonStyle(
-                backgroundColor:WidgetStateProperty.all(Colors.grey),
-                padding: WidgetStateProperty.all(EdgeInsets.fromLTRB(15,10,15,10))
-              ),
-              onPressed: (){
-                final String newTitle = editingController.text;
-                final todoCubit = context.read<TodoCubit>();
-                if(newTitle.isNotEmpty){
-                  todoCubit.editTodo(todo.id,newTitle);
-                  Navigator.of(context).pop();
-                }
-                Navigator.of(context).pop();
-              }, 
-              child:Text(
-                "Save",
-                style: TextStyle(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold
-                ),
-              )
-            ),
-            TextButton(
-              style:ButtonStyle(
-                backgroundColor:WidgetStateProperty.all(Theme.of(context).colorScheme.inversePrimary),
-                padding: WidgetStateProperty.all(EdgeInsets.fromLTRB(15,10,15,10))
-              ),
-              onPressed:()=>Navigator.of(context).pop(), 
-              child:Text(
-                "Cancel",
-                style: TextStyle(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold
-                ),
-              )
-            ),],
-        );
-      }
-    );
-  }
-
-  void _addTodo() {
-    final String title = controller.text;
-    final todoCubit = context.read<TodoCubit>();
-    if (title.isNotEmpty) {
-      todoCubit.addTodo(title);
-      controller.clear();
-    } else {
-      final messenger = ScaffoldMessenger.of(context);
-      messenger.showMaterialBanner(
-        MaterialBanner(
-          dividerColor: Colors.red,
-          backgroundColor: Colors.red,
-          leading: Icon(Icons.error_outline, color: Colors.white, size: 20),
-          content: Text(
-            "A Title is required for the Todo.",
-            style: TextStyle(color: Colors.white),
-          ),
-          actions: [
-            IconButton(
-              onPressed: () => messenger.hideCurrentMaterialBanner(),
-              icon: Icon(Icons.close, color: Colors.white, size: 20),
-            ),
-          ],
-        ),
-      );
-      Future.delayed(Duration(seconds: 3), () {
-        messenger.hideCurrentMaterialBanner();
-      });
-    }
-  }
-
-
-  void _deleteTodo(Todo todo){
-    showDialog(
-      context: context, 
-      builder: (context){
-        return AlertDialog(
-          title: Row(
-            children: [
-              Icon(
-                Icons.delete_forever_outlined,
-                color: Theme.of(context).colorScheme.inversePrimary,
-              ),
-              SizedBox(width: 10,),
-              Text("Delete Todo",style:TextStyle(
-                fontWeight: FontWeight.bold
-              ),)
-            ],
-          ),
-          content:Text(
-            "Are you sure you want to delete this Todo?",
-            style: TextStyle(
-              fontSize: 18
-            ),
-          ),
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
-          actions: [
-            TextButton(
-              style:ButtonStyle(
-                backgroundColor:WidgetStateProperty.all(Colors.grey),
-                padding: WidgetStateProperty.all(EdgeInsets.fromLTRB(15,10,15,10))
-              ),
-              onPressed:(){
-                context.read<TodoCubit>().deleteTodo(todo.id);
-                Navigator.of(context).pop();
-              }, 
-              child:Text(
-                "Yes",
-                style: TextStyle(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold
-                ),
-              )
-            ),
-            TextButton(
-              style:ButtonStyle(
-                backgroundColor:WidgetStateProperty.all(Theme.of(context).colorScheme.inversePrimary),
-                padding: WidgetStateProperty.all(EdgeInsets.fromLTRB(15,10,15,10))
-              ),
-              onPressed:()=>Navigator.of(context).pop(), 
-              child:Text(
-                "No",
-                style: TextStyle(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold
-                ),
-              )
-            ),
-          ],
-        );
-      }
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -260,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                       hintText: "Add new Task",
                     )),
                     SizedBox(width: 15),
-                    AddTodoButton(onTap: () => _addTodo()),
+                    AddTodoButton(onTap: () =>dialogs.addTodo(context, controller)),
                   ],
                 ),
               ),
@@ -312,9 +150,9 @@ class _HomePageState extends State<HomePage> {
                               final todo = todos[index];
                               return TodoTile(
                                 todo: todo,
-                                deleteFunction:()=>_deleteTodo(todo),
+                                deleteFunction:()=>dialogs.deleteTodo(context, todo),
                                 onCheck: () =>context.read<TodoCubit>().toggleTodo(todo),
-                                editFunction:()=>_editFunction(todo),
+                                editFunction:()=>dialogs.editFunction(context, todo,editingController),
                               );
                             },
                           );
