@@ -1,6 +1,7 @@
 # A Todo App Design From Dribble
 
-It's been a while since I last coded an app in Flutter,so I thought of picking a simple Todo App I found on Dribble by Arkan Naufal
+It's been a while since I last coded an app in Flutter,so I thought of picking a simple Todo App I found on Dribble by Arkan Naufal.
+
 I implemented this using Drift(moor). The App works full offline. 
 
 ### Here's the Design I implemented:
