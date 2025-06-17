@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 
 class TodoTextField extends StatelessWidget {
   final TextEditingController controller;
-  const TodoTextField({super.key, required this.controller});
+  final String hintText;
+  const TodoTextField({
+    super.key, 
+    required this.controller,
+    required this.hintText
+  });
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        hintText: "Add new Task",
+        hintText: hintText,
         contentPadding: EdgeInsets.only(left: 10),
         hintStyle: TextStyle(
           color: Theme.of(context).colorScheme.primary,

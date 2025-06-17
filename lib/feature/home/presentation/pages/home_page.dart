@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:awesome_quotes/awesome_quotes.dart';
+import 'package:dribbble_todo/core/cubit/theme_cubit.dart';
 import 'package:dribbble_todo/feature/home/domain/model/todo.dart';
 import 'package:dribbble_todo/feature/home/presentation/common/completed_counter.dart';
 import 'package:dribbble_todo/feature/home/presentation/cubit/todo_cubit.dart';
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController controller = TextEditingController();
+  final TextEditingController editingController = TextEditingController();
   Quote? quote;
   int completedCount=0;
 
@@ -37,9 +39,78 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    super.dispose();
     controller.clear();
     controller.dispose();
+    super.dispose();
+  }
+  
+  void _editFunction(Todo todo){
+    showDialog(
+      context: context, 
+      builder: (context){
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(
+                Icons.edit_outlined,
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
+              SizedBox(width: 10),
+              Text(
+                "Edit Todo",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                  fontWeight: FontWeight.bold
+                ),
+              )
+            ],
+          ),
+          content: TodoTextField(
+            controller: editingController,
+            hintText: todo.title,
+          ),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: [TextButton(
+              style:ButtonStyle(
+                backgroundColor:WidgetStateProperty.all(Colors.grey),
+                padding: WidgetStateProperty.all(EdgeInsets.fromLTRB(15,10,15,10))
+              ),
+              onPressed: (){
+                final String newTitle = editingController.text;
+                final todoCubit = context.read<TodoCubit>();
+                if(newTitle.isNotEmpty){
+                  todoCubit.editTodo(todo.id,newTitle);
+                  Navigator.of(context).pop();
+                }
+                Navigator.of(context).pop();
+              }, 
+              child:Text(
+                "Save",
+                style: TextStyle(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold
+                ),
+              )
+            ),
+            TextButton(
+              style:ButtonStyle(
+                backgroundColor:WidgetStateProperty.all(Theme.of(context).colorScheme.inversePrimary),
+                padding: WidgetStateProperty.all(EdgeInsets.fromLTRB(15,10,15,10))
+              ),
+              onPressed:()=>Navigator.of(context).pop(), 
+              child:Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold
+                ),
+              )
+            ),],
+        );
+      }
+    );
   }
 
   void _addTodo() {
@@ -101,10 +172,13 @@ class _HomePageState extends State<HomePage> {
           actions: [
             TextButton(
               style:ButtonStyle(
-                backgroundColor:WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
-                padding: WidgetStateProperty.all(EdgeInsets.all(5))
+                backgroundColor:WidgetStateProperty.all(Colors.grey),
+                padding: WidgetStateProperty.all(EdgeInsets.fromLTRB(15,10,15,10))
               ),
-              onPressed:()=>context.read<TodoCubit>().deleteTodo(todo.id), 
+              onPressed:(){
+                context.read<TodoCubit>().deleteTodo(todo.id);
+                Navigator.of(context).pop();
+              }, 
               child:Text(
                 "Yes",
                 style: TextStyle(
@@ -117,7 +191,7 @@ class _HomePageState extends State<HomePage> {
             TextButton(
               style:ButtonStyle(
                 backgroundColor:WidgetStateProperty.all(Theme.of(context).colorScheme.inversePrimary),
-                padding: WidgetStateProperty.all(EdgeInsets.all(5))
+                padding: WidgetStateProperty.all(EdgeInsets.fromLTRB(15,10,15,10))
               ),
               onPressed:()=>Navigator.of(context).pop(), 
               child:Text(
@@ -140,47 +214,58 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.dark_mode_outlined,
-              color: Theme.of(context).colorScheme.inversePrimary,
-              size: 30,
-            ),
-          ),
+          BlocBuilder<ThemeCubit,ThemeData>(
+            builder: (context,themestate){
+              final IconData icon = themestate.brightness == Brightness.dark
+              ?Icons.light_mode_outlined
+              :Icons.dark_mode_outlined;
+              return IconButton(
+                onPressed:()=>context.read<ThemeCubit>().toggleTheme(),
+                icon:Icon(
+                  icon,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                  size: 30,
+                ),
+              );
+            }
+          )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Text(
-                "Your To Do",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 35,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Text(
+                  "Your To Do",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 35,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Row(
-                children: [
-                  Expanded(child: TodoTextField(controller: controller)),
-                  SizedBox(width: 15),
-                  AddTodoButton(onTap: () => _addTodo()),
-                ],
+              SizedBox(height: 20),
+              Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Row(
+                  children: [
+                    Expanded(child: TodoTextField(
+                      controller: controller,
+                      hintText: "Add new Task",
+                    )),
+                    SizedBox(width: 15),
+                    AddTodoButton(onTap: () => _addTodo()),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 10),
-            Expanded(
-              child: BlocBuilder<TodoCubit, TodoStates>(
+              SizedBox(height: 10),
+              BlocBuilder<TodoCubit, TodoStates>(
                 builder: (context, state) {
                   if (state is TodoLoaded) {
                     return StreamBuilder(
@@ -221,14 +306,15 @@ class _HomePageState extends State<HomePage> {
                         } else {
                           return ListView.builder(
                             shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
                             itemCount: todos.length,
                             itemBuilder: (context, index) {
                               final todo = todos[index];
                               return TodoTile(
                                 todo: todo,
                                 deleteFunction:()=>_deleteTodo(todo),
-                                onCheck: () =>
-                                    context.read<TodoCubit>().toggleTodo(todo),
+                                onCheck: () =>context.read<TodoCubit>().toggleTodo(todo),
+                                editFunction:()=>_editFunction(todo),
                               );
                             },
                           );
@@ -256,24 +342,26 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
               ),
-            ),
-            SizedBox(height: 40),
-            CompletedCounter(),
-            SizedBox(height: 20,),
-            Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Text(
-                '"${quote!.text}"~${quote!.author}',
-                style: TextStyle(
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: 18,
-                  fontStyle: FontStyle.italic,
+              SizedBox(height: 40),
+              CompletedCounter(),
+              SizedBox(height: 10,),
+              Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Text(
+                  '"${quote!.text}"~${quote!.author}',
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 18,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 80,),
-          ],
+              SizedBox(height: 80,),
+            ],
+          ),
         ),
       ),
     );

@@ -1,4 +1,4 @@
-import 'package:dribbble_todo/feature/home/data/database/repository/drift_todo_helper.dart';
+import 'package:dribbble_todo/feature/home/data/repository/drift_todo_helper.dart';
 import 'package:dribbble_todo/feature/home/domain/model/todo.dart';
 import 'package:dribbble_todo/feature/home/presentation/cubit/todo_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

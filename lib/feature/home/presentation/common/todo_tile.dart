@@ -5,11 +5,13 @@ class TodoTile extends StatelessWidget {
   final Todo todo;
   final void Function() deleteFunction;
   final void Function() onCheck;
+  final void Function() editFunction;
   const TodoTile({
     super.key,
     required this.deleteFunction,
     required this.todo,
-    required this.onCheck
+    required this.onCheck,
+    required this.editFunction
   });
 
   @override
@@ -17,6 +19,7 @@ class TodoTile extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(top:5,bottom:5),
       child: ListTile(
+        onLongPress:editFunction,
         contentPadding: EdgeInsets.all(10),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(15),

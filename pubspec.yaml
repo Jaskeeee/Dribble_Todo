@@ -42,6 +42,7 @@ dependencies:
   path: ^1.9.1
   sqlite3_flutter_libs: ^0.5.34
   awesome_quotes: ^0.0.3
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
