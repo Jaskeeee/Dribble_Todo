@@ -1,11 +1,8 @@
-# dribbble_todo
+# A Todo App Design From Dribble
 
-A new Flutter project.
+It's been a while since I last coded an app in Flutter,so I thought of picking a simple Todo App I found on Dribble by Arkan Naufal
 
 ## Getting Started
-
-This project is a starting point for a Flutter application.
-
 A few resources to get you started if this is your first Flutter project:
 
 - [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
