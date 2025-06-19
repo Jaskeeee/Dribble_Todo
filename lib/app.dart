@@ -13,7 +13,7 @@ class App extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<TodoCubit>(create:(context)=>TodoCubit(driftTodoHelper: driftTodoHelper)),
-        BlocProvider<ThemeCubit>(create:(context)=>ThemeCubit(),)
+        BlocProvider<ThemeCubit>(create:(context)=>ThemeCubit())
       ],
       child: BlocBuilder<ThemeCubit,ThemeData>(
         builder: (context,themestate){
