@@ -122,16 +122,6 @@ class _HomePageState extends State<DesktopHomePage> {
                                 ),
                               );
                             }
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  color: Theme.of(context).colorScheme.secondary,
-                                  strokeWidth: 3,
-                                  strokeCap: StrokeCap.round,
-                                ),
-                              );
-                            }
                             List<Todo> todos = snapshot.data ?? [];
                             if (todos.isEmpty) {
                               return Center(
